@@ -6,6 +6,9 @@ find_library(USB_LIB usb-1.0)
 # Enable C++11
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
+SET(${USB_LIB}_INCLUDE_DIRS /usr/include/libusb-1.0)
+SET(${USB_LIB}_LIBRARIES ${USB_LIB})
+
 ###################################
 ## catkin specific configuration ##
 ###################################

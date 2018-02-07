@@ -468,7 +468,7 @@ void Crazyflie::requestLogToc()
   handleRequests();
   size_t len = getRequestResult<crtpLogGetInfoResponse>(0)->log_len;
   std::cout << "Log: " << len << std::endl;
-
+#if 0
   // Request detailed information
   startBatchRequest();
   for (size_t i = 0; i < len; ++i) {
@@ -486,7 +486,25 @@ void Crazyflie::requestLogToc()
     entry.type = (LogType)response->type;
     entry.group = std::string(&response->text[0]);
     entry.name = std::string(&response->text[entry.group.size() + 1]);
+    std::cout << entry.group << "-" << entry.name << std::endl;
   }
+#else
+  m_logTocEntries.resize(len);
+  for (size_t i = 0; i < len; ++i) {
+    startBatchRequest();
+    crtpLogGetItemRequest itemRequest(i);
+    addRequest(itemRequest, 2);
+    handleRequests();
+    auto response = getRequestResult<crtpLogGetItemResponse>(0);
+    LogTocEntry& entry = m_logTocEntries[i];
+    entry.id = i;
+    entry.type = (LogType)response->type;
+    entry.group = std::string(&response->text[0]);
+    entry.name = std::string(&response->text[entry.group.size() + 1]);
+    std::cout << entry.group << "-" << entry.name << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  }
+#endif
 }
 
 void Crazyflie::requestParamToc()
